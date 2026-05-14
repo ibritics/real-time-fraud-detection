@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Models (We want CI/CD to build these, not store them)
+models/
+
+# Environment
+.venv/
+env/
+.env
+
+# Docker
+.docker/
+
+# CSV
+.csv
