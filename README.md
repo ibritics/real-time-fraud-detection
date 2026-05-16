@@ -1,5 +1,9 @@
 <img width="1628" height="680" alt="image" src="https://github.com/user-attachments/assets/a04f4eac-25e0-401c-b728-067e1f9e81e3" />
-<br> **Real-Time Fraud Detection Engine with Apache Kafka & Machine Learning** <br>
+
+<br> <br>
+
+**Real-Time Fraud Detection Engine with Apache Kafka & Machine Learning** 
+<br>
 A high-performance, event-driven streaming pipeline designed to ingest, process, scale, and visualize financial transactions for real-time fraud detection.
 
 This project simulates real-world banking scales by streaming high-dimensional PCA components (matching the standard Kaggle Credit Card Fraud dataset layout) through an asynchronous Apache Kafka broker container, performing low-latency ML inference with automatic feature normalization, and displaying operational metrics in a live dashboard.
