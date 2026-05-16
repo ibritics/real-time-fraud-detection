@@ -25,3 +25,41 @@ Moving this local project to an enterprise cloud ecosystem requires Horizontal S
 Kafka Partitions & Consumer Groups: By breaking the transactions Kafka topic into multiple parallel streams (Partitions), you can deploy your stream_consumer.py worker script inside a Kubernetes (K8s) Cluster as an autoscale group. Kafka automatically splits partition loads evenly across all active containers.
 
 Swapping the Data Sink: For production volumes, the fraud_data.csv write layer must be swapped out for a distributed NoSQL Time-Series Database (such as Apache Cassandra, ScyllaDB, or Amazon DynamoDB) to handle millions of simultaneous concurrent writes across global infrastructure networks.
+<br> 
+🚀 **Deployment Instructions**
+Prerequisites <br>
+Python 3.11+
+Docker Desktop (Make sure the application is active and running)
+<br>
+1. Project Directory Configuration
+Ensure your local folder structure perfectly aligns with the required layout before executing scripts:
+
+
+real-time-fraud-detection/
+├── models/
+│   ├── feature_bounds.json
+│   ├── fraud_samples.json
+│   ├── scaler.pkl
+│   └── fraud_model.pkl
+├── dashboard.py
+├── docker-compose.yml
+├── requirements.txt
+├── start_project.bat
+├── stream_consumer.py
+├── stream_producer.py
+└── train.py
+<br>
+2. Automatic Initialization (Windows Batch Script)
+Double-click start_project.bat or run it from your command terminal:
+
+<br>
+--> start_project.bat
+This single orchestration script handles your complete pipeline execution sequence:
+
+Provisions and mounts the Apache Kafka container broker via Docker Compose.
+
+Halts for a 15-second safety cooldown to let internal network ports bind properly.
+
+Automatically fires up train.py to acquire datasets and serialize analytical models.
+
+Generates independent operational terminals for the Stream Consumer Worker, Streamlit Dashboard Web Server, and Transaction Stream Producer.
