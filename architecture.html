@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fraud Detection System — Scalability Framework</title>
+<style>
+  /* ── EDIT THESE VARIABLES TO RESTYLE ── */
+  :root {
+    --bg: #f5f4f0;
+    --panel-bg: #ffffff;
+    --panel-border: #c8c6be;
+    --header-bg: #1a1a1a;
+    --header-text: #ffffff;
+    --section-header-bg: #2c2c2c;
+    --section-header-text: #ffffff;
+    --box-bg: #ffffff;
+    --box-border: #999;
+    --box-radius: 4px;
+    --arrow-color: #333;
+    --label-color: #333;
+    --label-sm: #555;
+    --note-color: #444;
+    --font: 'Courier New', monospace;
+    --accent: #1a1a1a;
+    --tag-bg: #e8e8e4;
+    --tag-text: #333;
+    --lane-offline-bg: rgba(0,0,0,0.04);
+    --lane-live-bg: rgba(0,0,0,0.02);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    padding: 24px;
+    min-width: 1400px;
+  }
+
+  /* ── TITLE ── */
+  .title-block {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .title-block h1 {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── OUTER WRAPPER (lane labels + columns) ── */
+  .outer {
+    display: flex;
+    gap: 0;
+    border: 1.5px solid var(--panel-border);
+    background: var(--panel-bg);
+    position: relative;
+  }
+
+  /* ── LEFT LANE LABELS ── */
+  .lane-labels {
+    display: flex;
+    flex-direction: column;
+    width: 80px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--panel-border);
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--label-color);
+  }
+  .lane-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--panel-border);
+    background: var(--lane-offline-bg);
+  }
+  .lane-label.live { background: var(--lane-live-bg); flex: 1; border-bottom: none; }
+  .lane-label.offline { height: 130px; }
+  .lane-label.preproduction { height: 90px; }
+
+  /* ── MAIN COLUMNS ── */
+  .columns {
+    display: grid;
+    grid-template-columns: 200px 240px 220px 240px 200px;
+    flex: 1;
+    gap: 0;
+  }
+
+  .col {
+    border-right: 1px solid var(--panel-border);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .col:last-child { border-right: none; }
+
+  /* ── COLUMN HEADERS ── */
+  .col-header {
+    background: var(--section-header-bg);
+    color: var(--section-header-text);
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #555;
+    line-height: 1.4;
+  }
+  .col-header span {
+    display: block;
+    font-size: 9px;
+    font-weight: normal;
+    opacity: 0.8;
+    margin-top: 2px;
+    text-transform: none;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── COLUMN BODY ── */
+  .col-body {
+    flex: 1;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  }
+
+  /* ── BOXES ── */
+  .box {
+    background: var(--box-bg);
+    border: 1px solid var(--box-border);
+    border-radius: var(--box-radius);
+    padding: 6px 10px;
+    font-size: 11px;
+    text-align: center;
+    color: var(--label-color);
+    line-height: 1.4;
+    position: relative;
+  }
+  .box strong {
+    display: block;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .box em {
+    display: block;
+    font-size: 9px;
+    font-style: italic;
+    color: var(--label-sm);
+    margin-top: 2px;
+    font-family: var(--font);
+  }
+  .box .code {
+    display: block;
+    font-size: 10px;
+    font-family: var(--font);
+    margin-top: 2px;
+    color: #222;
+  }
+  .box .desc {
+    font-size: 9px;
+    color: var(--label-sm);
+    margin-top: 3px;
+    line-height: 1.35;
+  }
+
+  .box.docker {
+    background: #f0f0ec;
+    border-style: dashed;
+    border-width: 1.5px;
+  }
+  .box.kafka {
+    background: #fff8e8;
+    border-color: #c8a830;
+  }
+  .box.highlight {
+    border-width: 2px;
+    border-color: #333;
+  }
+  .box.sink {
+    background: #f0f0ec;
+    border-style: double;
+    border-width: 3px;
+  }
+
+  /* ── ARROWS ── */
+  .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--arrow-color);
+    margin: 2px 0;
+    position: relative;
+  }
+  .arrow .arrow-label {
+    font-size: 9px;
+    color: var(--label-sm);
+    position: absolute;
+    right: 0;
+    top: -10px;
+    white-space: nowrap;
+  }
+  .arrow .arrow-label-left {
+    font-size: 9px;
+    color: var(--label-sm);
+    position: absolute;
+    left: 0;
+    top: -10px;
+    white-space: nowrap;
+  }
+
+  /* ── TAGS / BADGES ── */
+  .tag {
+    display: inline-block;
+    font-size: 8px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 3px;
+    font-family: var(--font);
+  }
+
+  /* ── LOOP BADGE ── */
+  .loop-badge {
+    font-size: 9px;
+    color: #555;
+    background: #eee;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    padding: 2px 6px;
+    display: inline-block;
+    margin-bottom: 4px;
+  }
+
+  /* ── GROUP (dashed border group) ── */
+  .group {
+    border: 1px dashed #aaa;
+    border-radius: 4px;
+    padding: 8px;
+    margin: 4px 0;
+    position: relative;
+  }
+  .group-label {
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #555;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  /* ── CONSUMER GROUP HEADER ── */
+  .cg-header {
+    border: 1px solid #999;
+    border-radius: 3px;
+    padding: 4px 8px;
+    text-align: center;
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #333;
+    margin-bottom: 6px;
+    background: #f5f5f0;
+  }
+  .cg-sub {
+    font-size: 8px;
+    font-style: italic;
+    font-weight: normal;
+    color: #666;
+  }
+
+  /* ── NOTES ── */
+  .note {
+    font-size: 9px;
+    color: var(--note-color);
+    border-left: 2px solid #aaa;
+    padding-left: 6px;
+    margin-top: 4px;
+    line-height: 1.4;
+    font-style: italic;
+  }
+  .note.correction {
+    border-color: #c00;
+    color: #600;
+  }
+
+  /* ── BOTTOM NOTES ── */
+  .bottom-notes {
+    border-top: 1px solid var(--panel-border);
+    padding: 8px 16px;
+    font-size: 9px;
+    color: #555;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    background: #fafaf7;
+  }
+  .bottom-notes strong { color: #333; }
+
+  /* ── HORIZONTAL ARROW (between columns) ── */
+  /* achieved with connectors section outside columns */
+</style>
+</head>
+<body>
+
+<!-- ── EDIT TITLE HERE ── -->
+<div class="title-block">
+  <h1>Fraud Detection System's Scalability Framework</h1>
+</div>
+
+<div class="outer">
+
+  <!-- LEFT LANE LABELS (runtime, offline, pre-production) -->
+  <div class="lane-labels">
+    <div class="lane-label preproduction">Offline / Dev (Pre-Production)</div>
+    <div class="lane-label live">Live Event Pipeline (Runtime)</div>
+  </div>
+
+  <!-- FIVE COLUMNS -->
+  <div class="columns">
+
+    <!-- ══ COL 1: DATA ACQUISITION ══ -->
+    <div class="col">
+      <div class="col-header">
+        1. Data Acquisition &amp; Ingestion
+        <span>(Offline)</span>
+      </div>
+      <div class="col-body">
+
+        <div class="box highlight">
+          <strong>Source: Kaggle Dataset</strong>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="box">
+          <strong>Script: train.py</strong>
+          <em>(Python)</em>
+          <span class="desc">Fetches 'creditcard.csv', train 80% split, saves model to /models</span>
+        </div>
+
+        <div class="arrow">↓<span class="arrow-label">Initialize Ingestion</span></div>
+
+        <div class="box docker">
+          <strong>Docker Container</strong>
+          <em>(Kafka Broker)</em>
+          <span class="desc">Buffered data queue for simulated events</span>
+        </div>
+
+        <div style="margin-top: auto; padding-top: 12px;">
+          <div class="box" style="background:#f5f5f0;">
+            <strong>Batch Script:</strong>
+            <span class="code">start_project.bat</span>
+            <span class="desc">Initiates all Python scripts and Docker</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ COL 2: REAL-TIME SIMULATION ══ -->
+    <div class="col">
+      <div class="col-header">
+        2. Real-Time Simulation
+        <span>(Separate Producer Streams)</span>
+      </div>
+      <div class="col-body">
+
+        <div class="group">
+          <div class="group-label">Multiple Producer Instances (Python)</div>
+
+          <div class="loop-badge">Loop 1</div>
+
+          <div class="box">
+            <strong>Stream A</strong>
+            <span class="code">stream_producer.py</span>
+            <span class="desc">Generates Random Data Stream Using Kaggle Data · random.uniform(min, max)</span>
+          </div>
+
+          <div class="arrow" style="font-size:12px;"> -> </div>
+
+        
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- ══ COL 3: REAL-TIME PROCESSING ══ -->
+    <div class="col">
+      <div class="col-header">
+        3. Real-Time Processing
+        <span>(Docker / Kafka Breakdown)</span>
+      </div>
+      <div class="col-body">
+
+        <div class="box docker highlight">
+          <strong>Docker Container</strong>
+          <em>(Infrastructure Host)</em>
+          <span class="desc">Buffered, decoupled streams</span>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="box kafka highlight">
+          <strong>Kafka Broker</strong>
+          <em>(Data Queue)</em>
+          <span class="desc">Buffered message queue, decoupled producers &amp; consumers</span>
+        </div>
+
+        <div class="arrow">↓<span class="arrow-label">Shared Model/Sample Files</span></div>
+
+        <div class="note" style="margin-top:4px;">
+          Multiple scripts or containers are orchestrated for high availability and load management.
+        </div>
+
+        <div style="margin-top: 8px;">
+          <div class="note">Load Femplicatt</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ COL 4: REAL-TIME ANALYSIS ══ -->
+    <div class="col">
+      <div class="col-header">
+        4. Real-Time Analysis
+        <span>(Scalable Consumer Group)</span>
+      </div>
+      <div class="col-body">
+
+        <div class="cg-header">
+          Consumer Group
+          <div class="cg-sub">(Machine Learning Champion)</div>
+        </div>
+
+        <div class="box highlight">
+          <strong>Consumer Instance</strong>
+          <span class="code">stream_consumer.py</span>
+          <em>(Python)</em>
+          <span class="desc">Buffered consume, call model.predict(), enrich metadata</span>
+        </div>
+
+        <div style="font-size:9px; color:#666; text-align:center; margin: 4px 0;">Parallel Consume ↕</div>
+
+        <div class="box" style="background:#f5f5f0;">
+          <strong>Artifacts:</strong>
+          <span class="code">/models/fraud_model.pkl</span>
+        </div>
+
+
+    
+        <div class="note" style="margin-top: 6px;">
+          Write predicted events →
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ COL 5: STORAGE & VISUALIZATION ══ -->
+    <div class="col">
+      <div class="col-header">
+        5. Storage &amp; Visualization
+        <span>(The Data Sink)</span>
+      </div>
+      <div class="col-body">
+
+        <div class="box sink">
+          <strong>Data Sink:</strong>
+          <span class="code">fraud_data.csv</span>
+        </div>
+
+        <div class="arrow">↓<span class="arrow-label">Read latest state (CSV)</span></div>
+
+        <div class="box">
+          <strong>Script: dashboard.py</strong>
+          <em>(Python)</em>
+          <span class="desc">Reads CSV, updates UI automatically</span>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="box highlight" style="background:#fff8e8; border-color:#c8a830;">
+          <strong>Streamlit Dashboard</strong>
+          <em>(UI)</em>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /columns -->
+</div><!-- /outer -->
+
+<!-- BOTTOM NOTES -->
+<div class="bottom-notes">
+  <div>
+    <strong>Parallel Ingestion:</strong> Col 1 → Col 2
+  </div>
+  <div>
+    <strong>Parallel Consumption:</strong> Col 3 → Col 4 (multiple consumer instances)
+  </div>
+  <div>
+    <strong>Raw Legit JSON Stream (Noise):</strong> each producer → Kafka Broker
+  </div>
+
+</body>
+</html>
