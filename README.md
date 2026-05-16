@@ -35,19 +35,19 @@ Docker Desktop (Make sure the application is active and running)
 Ensure your local folder structure perfectly aligns with the required layout before executing scripts:
 
 
-real-time-fraud-detection/
-├── models/
-│   ├── feature_bounds.json
-│   ├── fraud_samples.json
-│   ├── scaler.pkl
-│   └── fraud_model.pkl
-├── dashboard.py
-├── docker-compose.yml
-├── requirements.txt
-├── start_project.bat
-├── stream_consumer.py
-├── stream_producer.py
-└── train.py
+real-time-fraud-detection/ <br> 
+├── models/ <br>
+│   ├── feature_bounds.json <br>
+│   ├── fraud_samples.json <br>
+│   ├── scaler.pkl<br>
+│   └── fraud_model.pkl <br>
+├── dashboard.py<br> 
+├── docker-compose.yml<br>
+├── requirements.txt <br>
+├── start_project.bat<br>
+├── stream_consumer.py <br>
+├── stream_producer.py <br>
+└── train.py <br>
 <br>
 2. Automatic Initialization (Windows Batch Script)
 Double-click start_project.bat or run it from your command terminal:
